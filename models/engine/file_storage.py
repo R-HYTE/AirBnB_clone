@@ -25,7 +25,13 @@ class FileStorage:
         Returns:
             dict: A dictionary with instance keys and corresponding objects.
         '''
-        return FileStorage.__objects
+        class_name_objects = {}
+        for key, obj in FileStorage.__objects.items():
+            class_name = key.split('.')[0]
+            if class_name not in class_name_objects:
+                class_name_objects[class_name] = {}
+            class_name_objects[class_name][key] = obj
+        return class_name_objects
 
     def new(self, obj):
         '''
@@ -58,6 +64,11 @@ class FileStorage:
             for obj_data in data.values():
                 cls_name = obj_data["__class__"]
                 del obj_data["__class__"]
-                self.new(eval(cls_name)(**obj_data))
+                
+                # Dynamically import the class using globals()
+                model_class = globals()[cls_name]
+
+                # Create an instance of the class and add it to the storage
+                self.new(model_class(**obj_data))
         except FileNotFoundError:
             return
