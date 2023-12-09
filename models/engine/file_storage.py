@@ -4,6 +4,12 @@ Module with the FileStorage class
 '''
 import json
 from models.base_model import BaseModel
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.state import State
+from models.review import Review
+from models.user import User
 
 
 class FileStorage:
@@ -14,9 +20,19 @@ class FileStorage:
         __file_path (str): The path to the JSON file.
         __objects (dict): A dictionary to store instances.
     '''
-
     __file_path = "file.json"
     __objects = {}
+
+    # Mapping class names to actual classes
+    CLASSES = {
+        "BaseModel": BaseModel,
+        "User": User,
+        "State": State,
+        "City": City,
+        "Place": Place,
+        "Amenity": Amenity,
+        "Review": Review
+    }
 
     def all(self):
         '''
@@ -25,13 +41,7 @@ class FileStorage:
         Returns:
             dict: A dictionary with instance keys and corresponding objects.
         '''
-        class_name_objects = {}
-        for key, obj in FileStorage.__objects.items():
-            class_name = key.split('.')[0]
-            if class_name not in class_name_objects:
-                class_name_objects[class_name] = {}
-            class_name_objects[class_name][key] = obj
-        return class_name_objects
+        return FileStorage.__objects
 
     def new(self, obj):
         '''
@@ -40,16 +50,17 @@ class FileStorage:
         Args:
             obj: The instance to be added.
         '''
-        key = f"{type(obj).__name__}.{obj.id}"
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
         FileStorage.__objects[key] = obj
 
     def save(self):
         '''
         Serialize stored instances and save them to the JSON file.
         '''
-        serialized_objects = {}
-        for key, obj in FileStorage.__objects.items():
-            serialized_objects[key] = obj.to_dict()
+        serialized_objects = {
+                key: obj.to_dict()
+                for key, obj in FileStorage.__objects.items()
+        }
         with open(FileStorage.__file_path, 'w', encoding='utf-8') as file:
             json.dump(serialized_objects, file)
 
@@ -60,15 +71,14 @@ class FileStorage:
         '''
         try:
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-            for obj_data in data.values():
-                cls_name = obj_data["__class__"]
-                del obj_data["__class__"]
-                
-                # Dynamically import the class using globals()
-                model_class = globals()[cls_name]
+                obj_dict = json.load(file)
 
-                # Create an instance of the class and add it to the storage
-                self.new(model_class(**obj_data))
+            for key, obj_data in obj_dict.items():
+                class_name = obj_data["__class__"]
+                del obj_data["__class__"]
+
+                if class_name in FileStorage.CLASSES:
+                    obj_instance = FileStorage.CLASSES[class_name](**obj_data)
+                    self.new(obj_instance)
         except FileNotFoundError:
             return
