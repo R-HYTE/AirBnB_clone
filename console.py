@@ -28,7 +28,10 @@ class HBNBCommand(cmd.Cmd):
             return
 
         args = arg.split()
-        if args[0] not in storage.all():
+        class_name = args[0]
+
+        # Check if the class name exists in the registered classes
+        if class_name not in storage.all().keys():
             print("** class doesn't exist **")
             return
 
@@ -36,8 +39,9 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
             return
 
-        key = "{}.{}".format(args[0], args[1])
-        objects = storage.all()
+        key = f"{class_name}.{args[1]}"
+
+        objects = storage.all()[class_name]
         if key not in objects:
             print("** no instance found **")
         else:
@@ -50,6 +54,8 @@ class HBNBCommand(cmd.Cmd):
             return
 
         args = arg.split()
+
+        # Check if the class name exists in the registered classes
         if args[0] not in storage.all():
             print("** class doesn't exist **")
             return
@@ -60,6 +66,7 @@ class HBNBCommand(cmd.Cmd):
 
         key = "{}.{}".format(args[0], args[1])
         objects = storage.all()
+
         if key not in objects:
             print("** no instance found **")
         else:
@@ -68,23 +75,28 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Print string representation of all instances"""
+        class_name = arg.split()[0] if arg else None
+
         objects = storage.all()
-        if not arg:
-            print([str(objects[key]) for key in objects])
+
+        if not class_name:
+            print([str(obj) for obj in objects.values()])
         else:
-            if arg not in storage.all():
+            if class_name not in objects:
                 print("** class doesn't exist **")
             else:
-                print([str(obj) for obj in objects.values() if obj.__class__.__name__ == arg])
+                print([str(obj) for obj in objects[class_name]])
 
     def do_update(self, arg):
         """Update an instance based on the class name and id"""
-        if not arg:
+        args = arg.split()
+
+        if not args:
             print("** class name missing **")
             return
 
-        args = arg.split()
-        if args[0] not in storage.all():
+        class_name = args[0]
+        if class_name not in storage.all():
             print("** class doesn't exist **")
             return
 
@@ -92,9 +104,11 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
             return
 
-        key = "{}.{}".format(args[0], args[1])
+        instance_id = args[1]
+        key = f"{class_name}.{instance_id}"
         objects = storage.all()
-        if key not in objects:
+
+        if instance_id not in [k.split('.')[1] for k in objects.get(class_name, {}).keys()]:
             print("** no instance found **")
             return
 
@@ -102,16 +116,38 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
             return
 
+        attribute_name = args[2]
         if len(args) < 4:
             print("** value missing **")
             return
 
-        # Assuming simple arguments (string, integer, float)
-        attr_name = args[2]
-        attr_value = args[3]
-        obj = objects[key]
-        setattr(obj, attr_name, attr_value)
-        obj.save()
+        attribute_value_str = args[3]
+    
+        # Handle the case where a string argument has a space between double quotes
+        if attribute_value_str[0] == '"' and attribute_value_str[-1] == '"':
+            attribute_value_str = attribute_value_str[1:-1]
+
+        # Get the class of the instance
+        instance_class = objects[key].__class__
+
+        # Check if the attribute is valid and can be updated
+        if attribute_name in ["id", "created_at", "updated_at"]:
+            print("** can't update attribute **")
+            return
+
+        # Get the attribute type from the class
+        attribute_type = type(getattr(instance_class(), attribute_name, None))
+
+        # Cast the attribute value to the correct type
+        try:
+            attribute_value = attribute_type(attribute_value_str)
+        except (ValueError, TypeError):
+            print("** invalid value **")
+            return
+
+        # Update the attribute and save the changes
+        setattr(objects[key], attribute_name, attribute_value)
+        storage.save()
 
     def do_quit(self, arg):
         """Quit command to exit the program
