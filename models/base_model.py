@@ -34,7 +34,7 @@ class BaseModel:
                 value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
             elif key == "__class__":
                 # Get the class type from the class name
-                value = models.storage.CLASSES[value]
+                value = globals()[value]
             setattr(self, key, value)
 
         # Add the new instance to the storage
