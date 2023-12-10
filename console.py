@@ -68,8 +68,10 @@ class HBNBCommand(cmd.Cmd):
         """
         args = self.parse_arguments(arg)
         obj_dict = storage.all()
-        if not args or args[0] not in self.valid_classes:
+        if not args:
             print("** class name missing **")
+        elif args[0] not in self.valid_classes:
+            print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
         elif f"{args[0]}.{args[1]}" not in obj_dict:
@@ -84,8 +86,10 @@ class HBNBCommand(cmd.Cmd):
         args = self.parse_arguments(arg)
         obj_dict = storage.all()
 
-        if not args or args[0] not in self.valid_classes:
+        if not args:
             print("** class name missing **")
+        elif args[0] not in self.valid_classes:
+            print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
         elif f"{args[0]}.{args[1]}" not in obj_dict:
@@ -121,13 +125,16 @@ class HBNBCommand(cmd.Cmd):
         args = self.parse_arguments(arg)
         obj_dict = storage.all()
 
-        if not args or args[0] not in self.valid_classes:
+        if not args:
             print("** class name missing **")
             return
-        if len(args) < 2:
+        elif args[0] not in self.valid_classes:
+            print("** class doesn't exist **")
+            return
+        elif len(args) < 2:
             print("** instance id missing **")
             return
-        if f"{args[0]}.{args[1]}" not in obj_dict:
+        elif f"{args[0]}.{args[1]}" not in obj_dict:
             print("** no instance found **")
             return
 
@@ -142,11 +149,11 @@ class HBNBCommand(cmd.Cmd):
             return
 
         attribute_name, attribute_value = args[2], args[3]
-        setattr(
-                instance,
-                attribute_name,
-                type(getattr(instance, attribute_name))(attribute_value)
-        )
+
+        if not hasattr(instance, attribute_name):
+            setattr(instance, attribute_name, None)
+
+        setattr(instance, attribute_name, attribute_value.strip('"'))
         storage.save()
 
 
