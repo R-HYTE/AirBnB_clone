@@ -32,6 +32,9 @@ class BaseModel:
         for key, value in kwargs.items():
             if key in ("created_at", "updated_at"):
                 value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+            elif key == "__class__":
+                # Get the class type from the class name
+                value = models.storage.CLASSES[value]
             setattr(self, key, value)
 
         # Add the new instance to the storage
