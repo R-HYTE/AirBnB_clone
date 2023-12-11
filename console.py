@@ -78,7 +78,6 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
         else:
             key = f"{args[0]}.{args[1]}"
-            print(f"Object key: {key}")
             print(obj_dict[key])
 
     def do_destroy(self, arg):
