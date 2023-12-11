@@ -28,6 +28,7 @@ class BaseModel:
         self.created_at = datetime.today()
         self.updated_at = datetime.today()
 
+        # If the kwargs is empty, the for loop will not execute
         # If kwargs is not empty, update instance attributes
         for key, value in kwargs.items():
             if key in ("created_at", "updated_at"):

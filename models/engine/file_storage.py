@@ -51,7 +51,7 @@ class FileStorage:
             obj: The instance to be added.
         '''
         key = f"{obj.__class__.__name__}.{obj.id}"
-        FileStorage.__objects[key] = obj
+        FileStorage.__objects[key] = obj  # Address of an obj in memory
 
     def save(self):
         '''
