@@ -1,3 +1,4 @@
+/* Filter Bar Styles */
 .filters {
 	background-color: white;
 	height: 70px;
@@ -8,6 +9,8 @@
 	display: flex;
 	align-items: center;
 }
+
+/* Filter Buttons */
 .filters button {
 	font-size: 18px;
 	background-color: #FF5A5F;
@@ -22,10 +25,12 @@
 	position: absolute;
 }
 .filters button:hover {
-	opacity: 90%;
+	opacity: 0.9;
 }
 
-.filters>.locations, .filters>.amenities {
+/* Filter Sections (Locations and Amenities) */
+.filters>.locations,
+.filters>.amenities {
 	height: 100%;
 	width: 25%;
 	padding: 15px, 40px;
@@ -34,23 +39,24 @@
 	flex-direction: column;
 	position: relative;
 }
+
 .locations {
 	border-right: 1px solid #DDDDDD;
 }
+
+/* Headings in Filter Sections */
 .filters h3 {
 	font-weight: 600;
-	margin-top: 15px;
-	margin-bottom: 0px;
-	margin-left: 25px;
-	margin-right: 25px;
+	margin: 15px 25px 0 25px;
 }
+
 .filters h4 {
 	font-weight: 400;
 	font-size: 14px;
-	margin-top: 0px;
-	margin-left: 25px;
-	margin-right: 25px;
+	margin: 0 25px;
 }
+
+/* Popovers for Locations and Amenities */
 .popover {
 	background-color: #FAFAFA;
 	border: 1px solid #DDDDDD;
@@ -66,7 +72,9 @@
 	list-style: none;
 }
 
-div:hover > .popover {
+div:hover > .popover,
+.locations:hover > .popover,
+.amenities:hover > .popover {
 	display: block;
 	cursor: pointer;
 }
@@ -80,17 +88,8 @@ div:hover > .popover {
 }
 
 .popover li {
-	margin: 10px 0px 5px 0px; 
+	margin-top: 10px; 
 	list-style: none;
-	padding-left: 20px;
-	display: block;
-	grid-row-gap: 4px;
-}
-
-.locations:hover > .popover {
-	display: block;
-}
-
-.amenities:hover > .popover {
+	padding-left: 0px;
 	display: block;
 }
