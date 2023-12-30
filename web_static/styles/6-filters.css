@@ -23,6 +23,7 @@
 	right: 30px;
 	top: 15%;
 	position: absolute;
+	transition: opacity 0.15s;
 }
 .filters button:hover {
 	opacity: 0.9;
